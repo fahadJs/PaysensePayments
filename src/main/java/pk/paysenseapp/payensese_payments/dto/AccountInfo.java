@@ -13,5 +13,5 @@ public class AccountInfo {
 
     private String accountName;
     private String accountNumber;
-    private String accountBalance;
+    private Integer accountBalance;
 }
