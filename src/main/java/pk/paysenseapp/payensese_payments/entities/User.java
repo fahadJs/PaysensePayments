@@ -40,7 +40,7 @@ public class User {
 
     private String phoneNumber;
 
-    private Integer accountBalance;
+    private BigDecimal accountBalance;
 
     private String status;
 

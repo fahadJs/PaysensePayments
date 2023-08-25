@@ -6,7 +6,9 @@ import pk.paysenseapp.payensese_payments.entities.User;
 
 @Repository
 public interface UserRepo extends JpaRepository<User,Long> {
+     Boolean existsByPhoneNumber(String phoneNumber);
 
-     boolean existsByEmail(String email);
-     boolean existsByPhoneNumber(String phoneNumber);
+     Boolean existsByAccountNumber(String accountNumber);
+
+     User findByAccountNumber(String accountNumber);
 }

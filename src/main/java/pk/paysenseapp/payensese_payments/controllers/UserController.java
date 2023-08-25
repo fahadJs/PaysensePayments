@@ -1,12 +1,8 @@
 package pk.paysenseapp.payensese_payments.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import pk.paysenseapp.payensese_payments.dto.BankResponse;
-import pk.paysenseapp.payensese_payments.dto.UserRequest;
+import org.springframework.web.bind.annotation.*;
+import pk.paysenseapp.payensese_payments.dto.*;
 import pk.paysenseapp.payensese_payments.services.UserService;
 
 @RestController
@@ -19,5 +15,25 @@ public class UserController {
     @PostMapping
     public BankResponse createAccount(@RequestBody UserRequest userRequest){
         return userService.createAccount(userRequest);
+    }
+
+    @GetMapping("/balanceEnquiry")
+    public BankResponse balanceEnquiry(@RequestBody EnquiryRequest enquiryRequest){
+        return userService.balanceEnquiry(enquiryRequest);
+    }
+
+    @GetMapping("/nameEnquiry")
+    public String nameEnquiry(@RequestBody EnquiryRequest enquiryRequest){
+        return userService.nameEnquiry(enquiryRequest);
+    }
+
+    @PostMapping("/creditAccount")
+    public BankResponse creditAccount(@RequestBody CreditRequest creditRequest){
+        return userService.creditAmount(creditRequest);
+    }
+
+    @PostMapping("/debitAccount")
+    public BankResponse debitAccount(@RequestBody DebitRequest debitRequest){
+        return userService.debitAmount(debitRequest);
     }
 }
