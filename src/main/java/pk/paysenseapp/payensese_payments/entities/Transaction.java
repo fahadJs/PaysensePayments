@@ -5,7 +5,10 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -23,5 +26,7 @@ public class Transaction {
     private String accountNumber;
     private String status;
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    private LocalDate createdOn;
+    @CreationTimestamp
+    private LocalTime createdAt;
 }

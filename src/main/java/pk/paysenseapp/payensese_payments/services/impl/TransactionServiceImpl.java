@@ -6,6 +6,9 @@ import pk.paysenseapp.payensese_payments.dto.TransactionDto;
 import pk.paysenseapp.payensese_payments.entities.Transaction;
 import pk.paysenseapp.payensese_payments.repositories.TransactionRepo;
 import pk.paysenseapp.payensese_payments.services.TransactionService;
+
+import java.util.List;
+
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
@@ -23,5 +26,12 @@ public class TransactionServiceImpl implements TransactionService {
 
         transactionRepo.save(transaction);
         System.out.println("Transaction Saved Successfully!");
+    }
+
+    @Override
+    public List<Transaction> recentTransactions(String accountNumber) {
+        List<Transaction> recentTransactionsList = transactionRepo.findAll().stream()
+                .filter(recentTransaction -> recentTransaction.getAccountNumber().equals(accountNumber)).toList();
+        return recentTransactionsList;
     }
 }
