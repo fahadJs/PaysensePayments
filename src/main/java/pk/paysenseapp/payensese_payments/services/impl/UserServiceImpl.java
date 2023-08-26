@@ -1,6 +1,7 @@
 package pk.paysenseapp.payensese_payments.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import pk.paysenseapp.payensese_payments.dto.*;
 import pk.paysenseapp.payensese_payments.entities.User;
@@ -40,6 +41,9 @@ public class UserServiceImpl implements UserService {
             return response;
         }
 
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        String encryptedPin = bCryptPasswordEncoder.encode(userRequest.getPin());
+
         User user = new User().builder()
                 .firstName(userRequest.getFirstName())
                 .lastName(userRequest.getLastName())
@@ -48,9 +52,10 @@ public class UserServiceImpl implements UserService {
                 .address(userRequest.getAddress())
                 .email(userRequest.getEmail())
                 .username(userRequest.getUsername())
-                .pin(userRequest.getPin())
+                .pin(encryptedPin)
                 .phoneNumber(userRequest.getPhoneNumber())
                 .status("ACTIVE")
+                .qrCode(AccountUtils.generateQrId(userRequest.getPhoneNumber(),8))
                 .accountBalance(BigDecimal.valueOf(0.0))
                 .accountNumber(userRequest.getPhoneNumber())
                 .build();
@@ -284,5 +289,22 @@ public class UserServiceImpl implements UserService {
                 .responseMessage(AccountUtils.TRANSFER_SUCCESSFUL_MESSAGE)
                 .accountInfo(null)
                 .build();
+    }
+
+    @Override
+    public String pinVerification(PinVerificationRequest pinVerificationRequest) {
+
+        Boolean isAccountExist = userRepo.existsByAccountNumber(pinVerificationRequest.getAccountNumber());
+        if (!isAccountExist){
+            return AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE;
+        }
+
+        User accountFound = userRepo.findByAccountNumber(pinVerificationRequest.getAccountNumber());
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+
+        if (!bCryptPasswordEncoder.matches(pinVerificationRequest.getPin(),accountFound.getPin())){
+            return "Incorrect Pin";
+        }
+        return "Pin Verified!";
     }
 }

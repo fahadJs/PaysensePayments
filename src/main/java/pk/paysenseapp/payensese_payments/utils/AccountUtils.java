@@ -1,6 +1,8 @@
 package pk.paysenseapp.payensese_payments.utils;
 
 
+import java.security.SecureRandom;
+
 public class AccountUtils {
     public static final String ACCOUNT_EXIST_CODE = "001";
     public static final String ACCOUNT_EXIST_MESSAGE = "Account already exist!";
@@ -24,5 +26,19 @@ public class AccountUtils {
 
     public static final String TRANSFER_SUCCESSFUL_CODE = "008";
     public static final String TRANSFER_SUCCESSFUL_MESSAGE = "Transfer Successful!";
+
+    public static String generateQrId(String accountNumber, Integer length){
+        final String ALPHA_NUMERIC_STRING = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
+
+        SecureRandom secureRandom = new SecureRandom();
+        StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < length; i++) {
+            int index = secureRandom.nextInt(ALPHA_NUMERIC_STRING.length());
+            char character = ALPHA_NUMERIC_STRING.charAt(index);
+            builder.append(character);
+        }
+        return builder.append(accountNumber).toString();
+    }
 
 }

@@ -1,6 +1,5 @@
 package pk.paysenseapp.payensese_payments.services;
 
-import org.springframework.stereotype.Service;
 import pk.paysenseapp.payensese_payments.dto.*;
 
 public interface UserService {
@@ -15,4 +14,6 @@ public interface UserService {
     BankResponse debitAmount(DebitRequest debitRequest);
 
     BankResponse transferAmount(TransferRequest transferRequest);
+
+    String pinVerification(PinVerificationRequest pinVerificationRequest);
 }

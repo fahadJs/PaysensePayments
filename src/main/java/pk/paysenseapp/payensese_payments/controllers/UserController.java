@@ -41,4 +41,10 @@ public class UserController {
     public BankResponse transfer(@RequestBody TransferRequest transferRequest){
         return userService.transferAmount(transferRequest);
     }
+
+    @GetMapping("/pinVerification")
+    public String pinVerification(@RequestBody PinVerificationRequest pinVerificationRequest){
+        return userService.pinVerification(pinVerificationRequest);
+    }
+
 }
