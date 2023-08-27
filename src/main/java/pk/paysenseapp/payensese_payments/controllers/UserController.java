@@ -12,9 +12,14 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping
-    public BankResponse createAccount(@RequestBody UserRequest userRequest){
-        return userService.createAccount(userRequest);
+    @PostMapping("/registerUser")
+    public UserRegisterResponse registerResponse(@RequestBody UserRegisterRequest registerRequest){
+        return userService.registerUser(registerRequest);
+    }
+
+    @PutMapping("/createAccount/{accountNumber}")
+    public BankResponse createAccount(@RequestBody UserRequest userRequest, @PathVariable String accountNumber){
+        return userService.createAccount(userRequest, accountNumber);
     }
 
     @GetMapping("/balanceEnquiry")
@@ -43,7 +48,7 @@ public class UserController {
     }
 
     @GetMapping("/pinVerification")
-    public String pinVerification(@RequestBody PinVerificationRequest pinVerificationRequest){
+    public BankResponse pinVerification(@RequestBody PinVerificationRequest pinVerificationRequest){
         return userService.pinVerification(pinVerificationRequest);
     }
 

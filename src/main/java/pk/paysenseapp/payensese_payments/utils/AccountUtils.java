@@ -27,6 +27,23 @@ public class AccountUtils {
     public static final String TRANSFER_SUCCESSFUL_CODE = "008";
     public static final String TRANSFER_SUCCESSFUL_MESSAGE = "Transfer Successful!";
 
+    public static final String PIN_VERIFICATION_SUCCESS_CODE = "009";
+    public static final String PIN_VERIFICATION_SUCCESS_MESSAGE = "Pin verification Success!";
+
+    public static final String PIN_VERIFICATION_FAILED_CODE = "010";
+    public static final String PIN_VERIFICATION_FAILED_MESSAGE = "Pin verification Failed!";
+
+    public static final String ACCOUNT_REGISTRATION_SUCCESS_CODE = "011";
+    public static final String ACCOUNT_REGISTRATION_SUCCESS_MESSAGE = "Registration successful!";
+
+    public static final String FILE_UPLOAD_SUCCESS_CODE = "012";
+    public static final String FILE_UPLOAD_SUCCESS_MESSAGE = "File uploaded successfully!";
+    public static final String FILE_UPLOAD_FAILED_CODE = "013";
+    public static final String FILE_UPLOAD_FAILED_MESSAGE = "File upload failed!";
+
+    public static final String FILE_EXIST_CODE = "014";
+    public static final String FILE_EXIST_MESSAGE = "File already exist!";
+
     public static String generateQrId(String accountNumber, Integer length){
         final String ALPHA_NUMERIC_STRING = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
 

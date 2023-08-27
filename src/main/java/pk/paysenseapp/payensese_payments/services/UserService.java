@@ -3,7 +3,9 @@ package pk.paysenseapp.payensese_payments.services;
 import pk.paysenseapp.payensese_payments.dto.*;
 
 public interface UserService {
-    BankResponse createAccount(UserRequest userRequest);
+
+    UserRegisterResponse registerUser(UserRegisterRequest userRegisterRequest);
+    BankResponse createAccount(UserRequest userRequest, String accountNumber);
 
     BankResponse balanceEnquiry(EnquiryRequest enquiryRequest);
 
@@ -15,5 +17,5 @@ public interface UserService {
 
     BankResponse transferAmount(TransferRequest transferRequest);
 
-    String pinVerification(PinVerificationRequest pinVerificationRequest);
+    BankResponse pinVerification(PinVerificationRequest pinVerificationRequest);
 }

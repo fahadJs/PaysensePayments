@@ -28,39 +28,91 @@ public class UserServiceImpl implements UserService {
     private TransactionService transactionService;
 
     @Override
-    public BankResponse createAccount(UserRequest userRequest) {
-//        Creating an Account and adding new user into the database
-//        Checking if the user has already an account.
+    public UserRegisterResponse registerUser(UserRegisterRequest userRegisterRequest) {
 
-        if (userRepo.existsByPhoneNumber(userRequest.getPhoneNumber())){
-            BankResponse response = BankResponse.builder()
+        User foundUser = userRepo.findByAccountNumber(userRegisterRequest.getPhoneNumber());
+
+        if (userRepo.existsByPhoneNumber(userRegisterRequest.getPhoneNumber())){
+            UserRegisterResponse response = UserRegisterResponse.builder()
                     .responseCode(AccountUtils.ACCOUNT_EXIST_CODE)
                     .responseMessage(AccountUtils.ACCOUNT_EXIST_MESSAGE)
-                    .accountInfo(null)
+                    .accountNumber(foundUser.getAccountNumber())
+                    .status(foundUser.getStatus())
                     .build();
             return response;
         }
 
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        String encryptedPin = bCryptPasswordEncoder.encode(userRequest.getPin());
+        String encryptedPin = bCryptPasswordEncoder.encode(userRegisterRequest.getPin());
 
         User user = new User().builder()
-                .firstName(userRequest.getFirstName())
-                .lastName(userRequest.getLastName())
-                .gender(userRequest.getGender())
-                .city(userRequest.getCity())
-                .address(userRequest.getAddress())
-                .email(userRequest.getEmail())
-                .username(userRequest.getUsername())
+                .firstName("PENDING APPROVAL")
+                .lastName("PENDING APPROVAL")
+                .gender("PENDING APPROVAL")
+                .city("PENDING APPROVAL")
+                .address("PENDING APPROVAL")
+                .email(userRegisterRequest.getEmail())
+                .username(userRegisterRequest.getUsername())
                 .pin(encryptedPin)
-                .phoneNumber(userRequest.getPhoneNumber())
-                .status("ACTIVE")
-                .qrCode(AccountUtils.generateQrId(userRequest.getPhoneNumber(),8))
+                .phoneNumber(userRegisterRequest.getPhoneNumber())
+                .status("PENDING APPROVAL")
+                .qrCode(AccountUtils.generateQrId(userRegisterRequest.getPhoneNumber(),9))
+                .faceImage("UPLOAD PENDING")
+                .nicImage("UPLOAD PENDING")
                 .accountBalance(BigDecimal.valueOf(0.0))
-                .accountNumber(userRequest.getPhoneNumber())
+                .accountNumber(userRegisterRequest.getPhoneNumber())
                 .build();
 
         User savedUser = userRepo.save(user);
+
+//        Send Email Alert
+        EmailDetails emailDetails = EmailDetails.builder()
+                .recipient(savedUser.getEmail())
+                .subject("ACCOUNT REGISTRATION SUCCESSFUL!")
+                .messageBody("Your Account has been successfully registered!\nIt will take 24 to 48 hours to get get your account approval.\n\nYou will be Notified via email you have provided.")
+                .build();
+        emailService.sendEmailAlert(emailDetails);
+
+        return UserRegisterResponse.builder()
+                .responseCode(AccountUtils.ACCOUNT_REGISTRATION_SUCCESS_CODE)
+                .responseMessage(AccountUtils.ACCOUNT_REGISTRATION_SUCCESS_MESSAGE)
+                .accountNumber(savedUser.getAccountNumber())
+                .status(savedUser.getStatus())
+                .build();
+    }
+
+    @Override
+    public BankResponse createAccount(UserRequest userRequest, String accountNumber) {
+//        Creating an Account and Updating user into the database
+//        Checking if the user has already an account.
+
+        User foundUser = userRepo.findByAccountNumber(accountNumber);
+
+        if (!userRepo.existsByPhoneNumber(accountNumber)){
+            BankResponse response = BankResponse.builder()
+                    .responseCode(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
+                    .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
+                    .accountInfo(null)
+                    .build();
+            return response;
+        }
+        foundUser.setFirstName(userRequest.getFirstName());
+        foundUser.setLastName(userRequest.getLastName());
+        foundUser.setGender(userRequest.getGender());
+        foundUser.setCity(userRequest.getCity());
+        foundUser.setAddress(userRequest.getAddress());
+        foundUser.setStatus("ACTIVE");
+
+//        User user = new User().builder()
+//                .firstName(userRequest.getFirstName())
+//                .lastName(userRequest.getLastName())
+//                .gender(userRequest.getGender())
+//                .city(userRequest.getCity())
+//                .address(userRequest.getAddress())
+//                .status("ACTIVE")
+//                .build();
+
+        User savedUser = userRepo.save(foundUser);
 
 //        Send Email Alert
         EmailDetails emailDetails = EmailDetails.builder()
@@ -292,19 +344,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String pinVerification(PinVerificationRequest pinVerificationRequest) {
+    public BankResponse pinVerification(PinVerificationRequest pinVerificationRequest) {
 
         Boolean isAccountExist = userRepo.existsByAccountNumber(pinVerificationRequest.getAccountNumber());
         if (!isAccountExist){
-            return AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE;
+            return BankResponse.builder()
+                    .responseCode(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
+                    .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
+                    .accountInfo(null)
+                    .build();
         }
 
         User accountFound = userRepo.findByAccountNumber(pinVerificationRequest.getAccountNumber());
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
         if (!bCryptPasswordEncoder.matches(pinVerificationRequest.getPin(),accountFound.getPin())){
-            return "Incorrect Pin";
+            return BankResponse.builder()
+                    .responseCode(AccountUtils.PIN_VERIFICATION_FAILED_CODE)
+                    .responseMessage(AccountUtils.PIN_VERIFICATION_FAILED_MESSAGE)
+                    .accountInfo(null)
+                    .build();
         }
-        return "Pin Verified!";
+        return BankResponse.builder()
+                .responseCode(AccountUtils.PIN_VERIFICATION_SUCCESS_CODE)
+                .responseMessage(AccountUtils.PIN_VERIFICATION_SUCCESS_MESSAGE)
+                .accountInfo(AccountInfo.builder()
+                        .accountName(accountFound.getFirstName() + " " + accountFound.getLastName())
+                        .accountNumber(accountFound.getAccountNumber())
+                        .accountBalance(accountFound.getAccountBalance())
+                        .build())
+                .build();
     }
 }

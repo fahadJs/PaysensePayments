@@ -46,6 +46,10 @@ public class User {
 
     private String qrCode;
 
+    private String faceImage;
+
+    private String nicImage;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
