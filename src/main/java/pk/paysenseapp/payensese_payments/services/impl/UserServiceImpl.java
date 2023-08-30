@@ -29,8 +29,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserRegisterResponse registerUser(UserRegisterRequest userRegisterRequest) {
-
         User foundUser = userRepo.findByAccountNumber(userRegisterRequest.getPhoneNumber());
+        User foundUsername = userRepo.findByUsername(userRegisterRequest.getUsername()+"@paysense");
 
         if (userRepo.existsByPhoneNumber(userRegisterRequest.getPhoneNumber())){
             UserRegisterResponse response = UserRegisterResponse.builder()
@@ -38,6 +38,16 @@ public class UserServiceImpl implements UserService {
                     .responseMessage(AccountUtils.ACCOUNT_EXIST_MESSAGE)
                     .accountNumber(foundUser.getAccountNumber())
                     .status(foundUser.getStatus())
+                    .build();
+            return response;
+        }
+
+        if (userRepo.existsByUsername(userRegisterRequest.getUsername() + "@paysense")){
+            UserRegisterResponse response = UserRegisterResponse.builder()
+                    .responseCode(AccountUtils.USERNAME_EXIST_CODE)
+                    .responseMessage(AccountUtils.USERNAME_EXIST_MESSAGE)
+                    .accountNumber(foundUsername.getAccountNumber())
+                    .status(foundUsername.getStatus())
                     .build();
             return response;
         }
@@ -52,11 +62,11 @@ public class UserServiceImpl implements UserService {
                 .city("PENDING APPROVAL")
                 .address("PENDING APPROVAL")
                 .email(userRegisterRequest.getEmail())
-                .username(userRegisterRequest.getUsername())
+                .username(userRegisterRequest.getUsername() + "@paysense")
                 .pin(encryptedPin)
                 .phoneNumber(userRegisterRequest.getPhoneNumber())
                 .status("PENDING APPROVAL")
-                .qrCode(AccountUtils.generateQrId(userRegisterRequest.getPhoneNumber(),9))
+                .qrCode(AccountUtils.generateQrId(userRegisterRequest.getPhoneNumber(),16))
                 .faceImage("UPLOAD PENDING")
                 .nicImage("UPLOAD PENDING")
                 .accountBalance(BigDecimal.valueOf(0.0))
@@ -373,6 +383,18 @@ public class UserServiceImpl implements UserService {
                         .accountNumber(accountFound.getAccountNumber())
                         .accountBalance(accountFound.getAccountBalance())
                         .build())
+                .build();
+    }
+
+    @Override
+    public QrCodeResponse qrCodePayment(QrCodeRequest qrCodeRequest) {
+        User foundUser = userRepo.findByQrCode(qrCodeRequest.getQrCodeId());
+
+        return QrCodeResponse.builder()
+                .responseCode(AccountUtils.QR_EXIST_CODE)
+                .responseMessage(AccountUtils.QR_EXIST_MESSAGE)
+                .destinationAccountName(foundUser.getFirstName() + " " + foundUser.getLastName())
+                .destinationAccountNumber(foundUser.getAccountNumber())
                 .build();
     }
 }

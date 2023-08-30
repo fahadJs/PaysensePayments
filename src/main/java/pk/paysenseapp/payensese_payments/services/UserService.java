@@ -18,4 +18,6 @@ public interface UserService {
     BankResponse transferAmount(TransferRequest transferRequest);
 
     BankResponse pinVerification(PinVerificationRequest pinVerificationRequest);
+
+    QrCodeResponse qrCodePayment(QrCodeRequest qrCodeRequest);
 }

@@ -52,4 +52,9 @@ public class UserController {
         return userService.pinVerification(pinVerificationRequest);
     }
 
+    @GetMapping("/qrCode")
+    public QrCodeResponse qrCodeResponse(@RequestBody QrCodeRequest qrCodeRequest){
+        return userService.qrCodePayment(qrCodeRequest);
+    }
+
 }

@@ -43,19 +43,26 @@ public class AccountUtils {
 
     public static final String FILE_EXIST_CODE = "014";
     public static final String FILE_EXIST_MESSAGE = "File already exist!";
+    public static final String QR_EXIST_CODE = "015";
+    public static final String QR_EXIST_MESSAGE = "Qr code Found!";
+
+    public static final String USERNAME_EXIST_CODE = "016";
+    public static final String USERNAME_EXIST_MESSAGE = "Username already exist!";
 
     public static String generateQrId(String accountNumber, Integer length){
-        final String ALPHA_NUMERIC_STRING = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
+        final String ALPHA_NUMERIC_STRING = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
         SecureRandom secureRandom = new SecureRandom();
         StringBuilder builder = new StringBuilder();
+
+        String lastDigits = accountNumber.substring(accountNumber.length() - 4);
 
         for (int i = 0; i < length; i++) {
             int index = secureRandom.nextInt(ALPHA_NUMERIC_STRING.length());
             char character = ALPHA_NUMERIC_STRING.charAt(index);
             builder.append(character);
         }
-        return builder.append(accountNumber).toString();
+        return builder.append(lastDigits).toString();
     }
 
 }
