@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>pk.paysenseapp</groupId>
-	<artifactId>payensese_payments</artifactId>
+	<artifactId>paysense_payments</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>payensese_payments</name>
 	<description>paysense payments management</description>
@@ -73,6 +73,14 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+			<version>1.12.547</version>
+		</dependency>
+
 
 
 
