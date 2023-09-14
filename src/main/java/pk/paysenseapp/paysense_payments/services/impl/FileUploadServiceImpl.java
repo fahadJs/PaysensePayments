@@ -2,6 +2,8 @@ package pk.paysenseapp.paysense_payments.services.impl;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import lombok.extern.log4j.Log4j2;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,20 +13,15 @@ import pk.paysenseapp.paysense_payments.repositories.UserRepo;
 import pk.paysenseapp.paysense_payments.services.FileUploadService;
 import pk.paysenseapp.paysense_payments.utils.AccountUtils;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.UUID;
 
 @Service
+@Log4j2
 public class FileUploadServiceImpl implements FileUploadService {
 
     @Value("${bucketName}")
     private String bucketName;
-
-    @Value("${bucketUrl}")
-    private String bucketUrl;
 
     private final UserRepo userRepo;
     private final AmazonS3 s3;
@@ -33,7 +30,6 @@ public class FileUploadServiceImpl implements FileUploadService {
         this.userRepo = userRepo;
         this.s3 = s3;
     }
-
 
     @Override
     public FileUploadResponse uploadImageNic(MultipartFile file, String accountNumber) {
@@ -59,19 +55,22 @@ public class FileUploadServiceImpl implements FileUploadService {
 
 //        Random File Name for security
         String randomId = "c-" + UUID.randomUUID();
+        assert name != null;
         String fileName = randomId.concat(name.substring(name.lastIndexOf(".")));
 
         try {
             s3.putObject(bucketName, fileName, file.getInputStream(), new ObjectMetadata());
-            foundUser.setNicImage(bucketUrl + fileName);
+            foundUser.setNicImage(fileName);
             User savedUser = userRepo.save(foundUser);
+
+            log.info("uploadImageNic PUT Request successfully processed! "+ DateTime.now());
             return FileUploadResponse.builder()
                     .responseCode(AccountUtils.FILE_UPLOAD_SUCCESS_CODE)
                     .responseMessage(AccountUtils.FILE_UPLOAD_SUCCESS_MESSAGE)
                     .filePath(savedUser.getNicImage())
                     .build();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.info(e.getMessage());
             return FileUploadResponse.builder()
                     .responseCode(AccountUtils.FILE_UPLOAD_FAILED_CODE)
                     .responseMessage(AccountUtils.FILE_UPLOAD_FAILED_MESSAGE)
@@ -104,19 +103,22 @@ public class FileUploadServiceImpl implements FileUploadService {
 
 //        Random File Name for security
         String randomId = "f-" + UUID.randomUUID();
+        assert name != null;
         String fileName = randomId.concat(name.substring(name.lastIndexOf(".")));
 
         try {
             s3.putObject(bucketName, fileName, file.getInputStream(), new ObjectMetadata());
-            foundUser.setFaceImage(bucketUrl + fileName);
+            foundUser.setFaceImage(fileName);
             User savedUser = userRepo.save(foundUser);
+
+            log.info("uploadImageFace PUT Request successfully processed! "+ DateTime.now());
             return FileUploadResponse.builder()
                     .responseCode(AccountUtils.FILE_UPLOAD_SUCCESS_CODE)
                     .responseMessage(AccountUtils.FILE_UPLOAD_SUCCESS_MESSAGE)
                     .filePath(savedUser.getFaceImage())
                     .build();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.info(e.getMessage());
             return FileUploadResponse.builder()
                     .responseCode(AccountUtils.FILE_UPLOAD_FAILED_CODE)
                     .responseMessage(AccountUtils.FILE_UPLOAD_FAILED_MESSAGE)

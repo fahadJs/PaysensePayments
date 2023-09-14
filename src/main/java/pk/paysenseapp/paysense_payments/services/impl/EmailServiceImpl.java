@@ -1,6 +1,7 @@
 package pk.paysenseapp.paysense_payments.services.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.log4j.Log4j2;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -10,10 +11,14 @@ import pk.paysenseapp.paysense_payments.dto.EmailDetails;
 import pk.paysenseapp.paysense_payments.services.EmailService;
 
 @Service
+@Log4j2
 public class EmailServiceImpl implements EmailService {
 
-    @Autowired
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
+
+    public EmailServiceImpl(JavaMailSender javaMailSender) {
+        this.javaMailSender = javaMailSender;
+    }
 
     @Value("${spring.mail.username}")
     private String senderEmail;
@@ -28,7 +33,7 @@ public class EmailServiceImpl implements EmailService {
             mailMessage.setSubject(emailDetails.getSubject());
 
             javaMailSender.send(mailMessage);
-            System.out.println("Mail sent successfully!");
+            log.info("Email successfully sent! "+ DateTime.now());
         } catch (MailException e){
             throw new RuntimeException(e);
         }

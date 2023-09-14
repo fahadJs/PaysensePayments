@@ -1,6 +1,7 @@
 package pk.paysenseapp.paysense_payments.services.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.log4j.Log4j2;
+import org.joda.time.DateTime;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import pk.paysenseapp.paysense_payments.dto.*;
@@ -15,17 +16,17 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 @Service
+@Log4j2
 public class UserServiceImpl implements UserService {
+    private final UserRepo userRepo;
+    private final EmailService emailService;
+    private final TransactionService transactionService;
 
-
-    @Autowired
-    private UserRepo userRepo;
-
-    @Autowired
-    private EmailService emailService;
-
-    @Autowired
-    private TransactionService transactionService;
+    public UserServiceImpl(UserRepo userRepo, EmailService emailService, TransactionService transactionService) {
+        this.userRepo = userRepo;
+        this.emailService = emailService;
+        this.transactionService = transactionService;
+    }
 
     @Override
     public UserRegisterResponse registerUser(UserRegisterRequest userRegisterRequest) {
@@ -33,29 +34,28 @@ public class UserServiceImpl implements UserService {
         User foundUsername = userRepo.findByUsername(userRegisterRequest.getUsername()+"@paysense");
 
         if (userRepo.existsByPhoneNumber(userRegisterRequest.getPhoneNumber())){
-            UserRegisterResponse response = UserRegisterResponse.builder()
+            return UserRegisterResponse.builder()
                     .responseCode(AccountUtils.ACCOUNT_EXIST_CODE)
                     .responseMessage(AccountUtils.ACCOUNT_EXIST_MESSAGE)
                     .accountNumber(foundUser.getAccountNumber())
                     .status(foundUser.getStatus())
                     .build();
-            return response;
         }
 
         if (userRepo.existsByUsername(userRegisterRequest.getUsername() + "@paysense")){
-            UserRegisterResponse response = UserRegisterResponse.builder()
+            return UserRegisterResponse.builder()
                     .responseCode(AccountUtils.USERNAME_EXIST_CODE)
                     .responseMessage(AccountUtils.USERNAME_EXIST_MESSAGE)
                     .accountNumber(foundUsername.getAccountNumber())
                     .status(foundUsername.getStatus())
                     .build();
-            return response;
         }
 
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         String encryptedPin = bCryptPasswordEncoder.encode(userRegisterRequest.getPin());
 
-        User user = new User().builder()
+        new User();
+        User user = User.builder()
                 .firstName("PENDING APPROVAL")
                 .lastName("PENDING APPROVAL")
                 .gender("PENDING APPROVAL")
@@ -83,6 +83,7 @@ public class UserServiceImpl implements UserService {
                 .build();
         emailService.sendEmailAlert(emailDetails);
 
+        log.info("registerUser POST Request successfully processed! "+ DateTime.now());
         return UserRegisterResponse.builder()
                 .responseCode(AccountUtils.ACCOUNT_REGISTRATION_SUCCESS_CODE)
                 .responseMessage(AccountUtils.ACCOUNT_REGISTRATION_SUCCESS_MESSAGE)
@@ -99,21 +100,19 @@ public class UserServiceImpl implements UserService {
         User foundUser = userRepo.findByAccountNumber(accountNumber);
 
         if (!userRepo.existsByPhoneNumber(accountNumber)){
-            BankResponse response = BankResponse.builder()
+            return BankResponse.builder()
                     .responseCode(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
                     .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
                     .accountInfo(null)
                     .build();
-            return response;
         }
 
         if (userRepo.existsByPhoneNumber(accountNumber)){
-            BankResponse response = BankResponse.builder()
+            return BankResponse.builder()
                     .responseCode(AccountUtils.ACCOUNT_EXIST_CODE)
                     .responseMessage(AccountUtils.ACCOUNT_EXIST_MESSAGE)
                     .accountInfo(null)
                     .build();
-            return response;
         }
 
         foundUser.setFirstName(userRequest.getFirstName());
@@ -122,15 +121,6 @@ public class UserServiceImpl implements UserService {
         foundUser.setCity(userRequest.getCity());
         foundUser.setAddress(userRequest.getAddress());
         foundUser.setStatus("ACTIVE");
-
-//        User user = new User().builder()
-//                .firstName(userRequest.getFirstName())
-//                .lastName(userRequest.getLastName())
-//                .gender(userRequest.getGender())
-//                .city(userRequest.getCity())
-//                .address(userRequest.getAddress())
-//                .status("ACTIVE")
-//                .build();
 
         User savedUser = userRepo.save(foundUser);
 
@@ -144,6 +134,7 @@ public class UserServiceImpl implements UserService {
                 .build();
         emailService.sendEmailAlert(emailDetails);
 
+        log.info("createAccount PUT Request successfully processed! "+ DateTime.now());
         return BankResponse.builder()
                 .responseCode(AccountUtils.ACCOUNT_CREATION_CODE)
                 .responseMessage(AccountUtils.ACCOUNT_CREATION_MESSAGE)
@@ -167,6 +158,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User accountFound = userRepo.findByAccountNumber(enquiryRequest.getAccountNumber());
+        log.info("balanceEnquiry GET Request successfully processed! "+ DateTime.now());
         return BankResponse.builder()
                 .responseCode(AccountUtils.ACCOUNT_FOUND_CODE)
                 .responseMessage(AccountUtils.ACCOUNT_FOUND_MESSAGE)
@@ -186,6 +178,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User accountFound = userRepo.findByAccountNumber(enquiryRequest.getAccountNumber());
+        log.info("nameEnquiry GET Request successfully processed! "+ DateTime.now());
         return accountFound.getFirstName() + " " + accountFound.getLastName();
     }
 
@@ -214,6 +207,7 @@ public class UserServiceImpl implements UserService {
 
         emailService.sendEmailAlert(creditAlert);
 
+        log.info("creditAmount POST Request successfully processed! "+ DateTime.now());
 //        Save Transaction
         TransactionDto creditTransaction = TransactionDto.builder()
                 .accountNumber(userToCredit.getAccountNumber())
@@ -262,6 +256,7 @@ public class UserServiceImpl implements UserService {
             userToDebit.setAccountBalance(userToDebit.getAccountBalance().subtract(debitRequest.getAmount()));
             userRepo.save(userToDebit);
 
+            log.info("debitAmount POST Request successfully processed! "+ DateTime.now());
 //        DEBIT Email Notification
             EmailDetails debitAlert = EmailDetails.builder()
                     .subject("ACCOUNT DEBITED")
@@ -356,6 +351,7 @@ public class UserServiceImpl implements UserService {
                 .build();
         emailService.sendEmailAlert(debitAlert);
 
+        log.info("transfer POST Request successfully processed! "+ DateTime.now());
         return BankResponse.builder()
                 .responseCode(AccountUtils.TRANSFER_SUCCESSFUL_CODE)
                 .responseMessage(AccountUtils.TRANSFER_SUCCESSFUL_MESSAGE)
@@ -385,6 +381,8 @@ public class UserServiceImpl implements UserService {
                     .accountInfo(null)
                     .build();
         }
+
+        log.info("pinVerification GET Request successfully processed! "+ DateTime.now());
         return BankResponse.builder()
                 .responseCode(AccountUtils.PIN_VERIFICATION_SUCCESS_CODE)
                 .responseMessage(AccountUtils.PIN_VERIFICATION_SUCCESS_MESSAGE)
@@ -400,6 +398,7 @@ public class UserServiceImpl implements UserService {
     public QrCodeResponse qrCodePayment(QrCodeRequest qrCodeRequest) {
         User foundUser = userRepo.findByQrCode(qrCodeRequest.getQrCodeId());
 
+        log.info("qrCode GET Request successfully processed! "+ DateTime.now());
         return QrCodeResponse.builder()
                 .responseCode(AccountUtils.QR_EXIST_CODE)
                 .responseMessage(AccountUtils.QR_EXIST_MESSAGE)
