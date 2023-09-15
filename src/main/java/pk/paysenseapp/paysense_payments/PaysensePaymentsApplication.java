@@ -30,7 +30,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 		)
 )
 public class PaysensePaymentsApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(PaysensePaymentsApplication.class, args);
 	}
