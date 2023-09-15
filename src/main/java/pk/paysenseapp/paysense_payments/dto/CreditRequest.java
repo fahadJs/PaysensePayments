@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreditRequest {
+
     private String accountNumber;
     private BigDecimal amount;
 }

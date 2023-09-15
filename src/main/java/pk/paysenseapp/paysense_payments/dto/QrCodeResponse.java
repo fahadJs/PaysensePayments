@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QrCodeResponse {
+
     private String responseCode;
     private String responseMessage;
     private String destinationAccountNumber;

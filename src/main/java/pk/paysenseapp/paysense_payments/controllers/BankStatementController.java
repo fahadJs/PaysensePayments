@@ -12,13 +12,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/bankStatement")
-@AllArgsConstructor
 @Log4j2
 @CrossOrigin("*")
 public class BankStatementController {
 
-    @Autowired
-    private BankStatementService bankStatementService;
+    private final BankStatementService bankStatementService;
+    public BankStatementController(BankStatementService bankStatementService) {
+        this.bankStatementService = bankStatementService;
+    }
 
     @GetMapping()
     public List<Transaction> generateBankStatement(@RequestParam String accountNumber,

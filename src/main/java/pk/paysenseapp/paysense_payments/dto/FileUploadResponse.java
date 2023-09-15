@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FileUploadResponse {
+
     private String responseCode;
     private String responseMessage;
     private String filePath;

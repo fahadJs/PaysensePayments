@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pk.paysenseapp.paysense_payments.dto.FileUploadResponse;
@@ -38,14 +39,14 @@ public class FileUploadServiceImpl implements FileUploadService {
 
         if (!userRepo.existsByPhoneNumber(accountNumber)) {
             return FileUploadResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
                     .build();
         }
 
         if (!foundUser.getNicImage().equals("UPLOAD PENDING")) {
             return FileUploadResponse.builder()
-                    .responseCode(AccountUtils.FILE_EXIST_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.FILE_EXIST_MESSAGE)
                     .build();
         }
@@ -63,21 +64,20 @@ public class FileUploadServiceImpl implements FileUploadService {
             foundUser.setNicImage(fileName);
             User savedUser = userRepo.save(foundUser);
 
-            log.info("uploadImageNic PUT Request successfully processed! "+ DateTime.now());
+            log.info("uploadImageNic PUT Request successfully processed!");
             return FileUploadResponse.builder()
-                    .responseCode(AccountUtils.FILE_UPLOAD_SUCCESS_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.FILE_UPLOAD_SUCCESS_MESSAGE)
                     .filePath(savedUser.getNicImage())
                     .build();
         } catch (IOException e) {
             log.info(e.getMessage());
             return FileUploadResponse.builder()
-                    .responseCode(AccountUtils.FILE_UPLOAD_FAILED_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.FILE_UPLOAD_FAILED_MESSAGE)
                     .filePath(null)
                     .build();
         }
-
     }
 
     @Override
@@ -86,14 +86,14 @@ public class FileUploadServiceImpl implements FileUploadService {
 
         if (!userRepo.existsByPhoneNumber(accountNumber)) {
             return FileUploadResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
                     .build();
         }
 
         if (!foundUser.getFaceImage().equals("UPLOAD PENDING")) {
             return FileUploadResponse.builder()
-                    .responseCode(AccountUtils.FILE_EXIST_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.FILE_EXIST_MESSAGE)
                     .build();
         }
@@ -111,20 +111,19 @@ public class FileUploadServiceImpl implements FileUploadService {
             foundUser.setFaceImage(fileName);
             User savedUser = userRepo.save(foundUser);
 
-            log.info("uploadImageFace PUT Request successfully processed! "+ DateTime.now());
+            log.info("uploadImageFace PUT Request successfully processed!");
             return FileUploadResponse.builder()
-                    .responseCode(AccountUtils.FILE_UPLOAD_SUCCESS_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.FILE_UPLOAD_SUCCESS_MESSAGE)
                     .filePath(savedUser.getFaceImage())
                     .build();
         } catch (IOException e) {
             log.info(e.getMessage());
             return FileUploadResponse.builder()
-                    .responseCode(AccountUtils.FILE_UPLOAD_FAILED_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.FILE_UPLOAD_FAILED_MESSAGE)
                     .filePath(null)
                     .build();
         }
-
     }
 }

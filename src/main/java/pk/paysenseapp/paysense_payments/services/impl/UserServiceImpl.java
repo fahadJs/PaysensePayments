@@ -2,6 +2,7 @@ package pk.paysenseapp.paysense_payments.services.impl;
 
 import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import pk.paysenseapp.paysense_payments.dto.*;
@@ -35,7 +36,7 @@ public class UserServiceImpl implements UserService {
 
         if (userRepo.existsByPhoneNumber(userRegisterRequest.getPhoneNumber())){
             return UserRegisterResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_EXIST_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.ACCOUNT_EXIST_MESSAGE)
                     .accountNumber(foundUser.getAccountNumber())
                     .status(foundUser.getStatus())
@@ -44,7 +45,7 @@ public class UserServiceImpl implements UserService {
 
         if (userRepo.existsByUsername(userRegisterRequest.getUsername() + "@paysense")){
             return UserRegisterResponse.builder()
-                    .responseCode(AccountUtils.USERNAME_EXIST_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.USERNAME_EXIST_MESSAGE)
                     .accountNumber(foundUsername.getAccountNumber())
                     .status(foundUsername.getStatus())
@@ -83,9 +84,9 @@ public class UserServiceImpl implements UserService {
                 .build();
         emailService.sendEmailAlert(emailDetails);
 
-        log.info("registerUser POST Request successfully processed! "+ DateTime.now());
+        log.info("registerUser POST Request successfully processed!");
         return UserRegisterResponse.builder()
-                .responseCode(AccountUtils.ACCOUNT_REGISTRATION_SUCCESS_CODE)
+                .responseCode(HttpStatus.OK.toString())
                 .responseMessage(AccountUtils.ACCOUNT_REGISTRATION_SUCCESS_MESSAGE)
                 .accountNumber(savedUser.getAccountNumber())
                 .status(savedUser.getStatus())
@@ -101,7 +102,7 @@ public class UserServiceImpl implements UserService {
 
         if (!userRepo.existsByPhoneNumber(accountNumber)){
             return BankResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
                     .accountInfo(null)
                     .build();
@@ -109,7 +110,7 @@ public class UserServiceImpl implements UserService {
 
         if (userRepo.existsByPhoneNumber(accountNumber)){
             return BankResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_EXIST_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.ACCOUNT_EXIST_MESSAGE)
                     .accountInfo(null)
                     .build();
@@ -134,9 +135,9 @@ public class UserServiceImpl implements UserService {
                 .build();
         emailService.sendEmailAlert(emailDetails);
 
-        log.info("createAccount PUT Request successfully processed! "+ DateTime.now());
+        log.info("createAccount PUT Request successfully processed!");
         return BankResponse.builder()
-                .responseCode(AccountUtils.ACCOUNT_CREATION_CODE)
+                .responseCode(HttpStatus.OK.toString())
                 .responseMessage(AccountUtils.ACCOUNT_CREATION_MESSAGE)
                 .accountInfo(AccountInfo.builder()
                         .accountNumber(savedUser.getAccountNumber())
@@ -151,16 +152,16 @@ public class UserServiceImpl implements UserService {
         Boolean isAccountExist = userRepo.existsByAccountNumber(enquiryRequest.getAccountNumber());
         if (!isAccountExist){
             return BankResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
                     .accountInfo(null)
                     .build();
         }
 
         User accountFound = userRepo.findByAccountNumber(enquiryRequest.getAccountNumber());
-        log.info("balanceEnquiry GET Request successfully processed! "+ DateTime.now());
+        log.info("balanceEnquiry GET Request successfully processed!");
         return BankResponse.builder()
-                .responseCode(AccountUtils.ACCOUNT_FOUND_CODE)
+                .responseCode(HttpStatus.OK.toString())
                 .responseMessage(AccountUtils.ACCOUNT_FOUND_MESSAGE)
                 .accountInfo(AccountInfo.builder()
                         .accountBalance(accountFound.getAccountBalance())
@@ -178,7 +179,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User accountFound = userRepo.findByAccountNumber(enquiryRequest.getAccountNumber());
-        log.info("nameEnquiry GET Request successfully processed! "+ DateTime.now());
+        log.info("nameEnquiry GET Request successfully processed!");
         return accountFound.getFirstName() + " " + accountFound.getLastName();
     }
 
@@ -187,7 +188,7 @@ public class UserServiceImpl implements UserService {
         Boolean isAccountExist = userRepo.existsByAccountNumber(creditRequest.getAccountNumber());
         if (!isAccountExist){
             return BankResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
                     .accountInfo(null)
                     .build();
@@ -207,7 +208,7 @@ public class UserServiceImpl implements UserService {
 
         emailService.sendEmailAlert(creditAlert);
 
-        log.info("creditAmount POST Request successfully processed! "+ DateTime.now());
+        log.info("creditAmount POST Request successfully processed!");
 //        Save Transaction
         TransactionDto creditTransaction = TransactionDto.builder()
                 .accountNumber(userToCredit.getAccountNumber())
@@ -217,7 +218,7 @@ public class UserServiceImpl implements UserService {
         transactionService.saveTransaction(creditTransaction);
 
         return BankResponse.builder()
-                .responseCode(AccountUtils.ACCOUNT_CREDITED_CODE)
+                .responseCode(HttpStatus.OK.toString())
                 .responseMessage(AccountUtils.ACCOUNT_CREDITED_MESSAGE)
                 .accountInfo(AccountInfo.builder()
                         .accountBalance(userToCredit.getAccountBalance())
@@ -236,7 +237,7 @@ public class UserServiceImpl implements UserService {
         Boolean isAccountExist = userRepo.existsByAccountNumber(debitRequest.getAccountNumber());
         if (!isAccountExist){
             return BankResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
                     .accountInfo(null)
                     .build();
@@ -248,7 +249,7 @@ public class UserServiceImpl implements UserService {
 
         if (availableBalance.intValue() < debitAmount.intValue()){
             return BankResponse.builder()
-                    .responseCode(AccountUtils.INSUFFICIENT_BALANCE_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.INSUFFICIENT_BALANCE_MESSAGE)
                     .accountInfo(null)
                     .build();
@@ -256,7 +257,7 @@ public class UserServiceImpl implements UserService {
             userToDebit.setAccountBalance(userToDebit.getAccountBalance().subtract(debitRequest.getAmount()));
             userRepo.save(userToDebit);
 
-            log.info("debitAmount POST Request successfully processed! "+ DateTime.now());
+            log.info("debitAmount POST Request successfully processed!");
 //        DEBIT Email Notification
             EmailDetails debitAlert = EmailDetails.builder()
                     .subject("ACCOUNT DEBITED")
@@ -275,7 +276,7 @@ public class UserServiceImpl implements UserService {
             transactionService.saveTransaction(debitTransaction);
 
             return BankResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_DEBITED_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.ACCOUNT_DEBITED_MESSAGE)
                     .accountInfo(AccountInfo.builder()
                             .accountBalance(userToDebit.getAccountBalance())
@@ -292,7 +293,7 @@ public class UserServiceImpl implements UserService {
         Boolean isDestinationAccountExist = userRepo.existsByAccountNumber(transferRequest.getDestinationAccountNumber());
         if (!isDestinationAccountExist){
             return BankResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
                     .accountInfo(null)
                     .build();
@@ -301,7 +302,7 @@ public class UserServiceImpl implements UserService {
         User sourceAccountUser = userRepo.findByAccountNumber(transferRequest.getSourceAccountNumber());
         if (transferRequest.getAmount().compareTo(sourceAccountUser.getAccountBalance()) > 0){
             return BankResponse.builder()
-                    .responseCode(AccountUtils.INSUFFICIENT_BALANCE_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.INSUFFICIENT_BALANCE_MESSAGE)
                     .accountInfo(null)
                     .build();
@@ -353,7 +354,7 @@ public class UserServiceImpl implements UserService {
 
         log.info("transfer POST Request successfully processed! "+ DateTime.now());
         return BankResponse.builder()
-                .responseCode(AccountUtils.TRANSFER_SUCCESSFUL_CODE)
+                .responseCode(HttpStatus.OK.toString())
                 .responseMessage(AccountUtils.TRANSFER_SUCCESSFUL_MESSAGE)
                 .accountInfo(null)
                 .build();
@@ -365,7 +366,7 @@ public class UserServiceImpl implements UserService {
         Boolean isAccountExist = userRepo.existsByAccountNumber(pinVerificationRequest.getAccountNumber());
         if (!isAccountExist){
             return BankResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
                     .accountInfo(null)
                     .build();
@@ -376,15 +377,15 @@ public class UserServiceImpl implements UserService {
 
         if (!bCryptPasswordEncoder.matches(pinVerificationRequest.getPin(),accountFound.getPin())){
             return BankResponse.builder()
-                    .responseCode(AccountUtils.PIN_VERIFICATION_FAILED_CODE)
+                    .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.PIN_VERIFICATION_FAILED_MESSAGE)
                     .accountInfo(null)
                     .build();
         }
 
-        log.info("pinVerification GET Request successfully processed! "+ DateTime.now());
+        log.info("pinVerification GET Request successfully processed!");
         return BankResponse.builder()
-                .responseCode(AccountUtils.PIN_VERIFICATION_SUCCESS_CODE)
+                .responseCode(HttpStatus.OK.toString())
                 .responseMessage(AccountUtils.PIN_VERIFICATION_SUCCESS_MESSAGE)
                 .accountInfo(AccountInfo.builder()
                         .accountName(accountFound.getFirstName() + " " + accountFound.getLastName())
@@ -397,13 +398,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public QrCodeResponse qrCodePayment(QrCodeRequest qrCodeRequest) {
         User foundUser = userRepo.findByQrCode(qrCodeRequest.getQrCodeId());
-
-        log.info("qrCode GET Request successfully processed! "+ DateTime.now());
-        return QrCodeResponse.builder()
-                .responseCode(AccountUtils.QR_EXIST_CODE)
-                .responseMessage(AccountUtils.QR_EXIST_MESSAGE)
-                .destinationAccountName(foundUser.getFirstName() + " " + foundUser.getLastName())
-                .destinationAccountNumber(foundUser.getAccountNumber())
-                .build();
+        if (foundUser != null) {
+            log.info("qrCode GET Request successfully processed!");
+            return QrCodeResponse.builder()
+                    .responseCode(HttpStatus.OK.toString())
+                    .responseMessage(AccountUtils.QR_EXIST_MESSAGE)
+                    .destinationAccountName(foundUser.getFirstName() + " " + foundUser.getLastName())
+                    .destinationAccountNumber(foundUser.getAccountNumber())
+                    .build();
+        }else {
+            return QrCodeResponse.builder()
+                    .responseCode(HttpStatus.OK.toString())
+                    .responseMessage(AccountUtils.QR_NOT_EXIST_MESSAGE)
+                    .build();
+        }
     }
 }

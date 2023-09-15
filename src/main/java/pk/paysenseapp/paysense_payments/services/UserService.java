@@ -5,6 +5,7 @@ import pk.paysenseapp.paysense_payments.dto.*;
 public interface UserService {
 
     UserRegisterResponse registerUser(UserRegisterRequest userRegisterRequest);
+
     BankResponse createAccount(UserRequest userRequest, String accountNumber);
 
     BankResponse balanceEnquiry(EnquiryRequest enquiryRequest);

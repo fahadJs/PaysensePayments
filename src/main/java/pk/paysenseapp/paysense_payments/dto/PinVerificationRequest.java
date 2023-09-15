@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PinVerificationRequest {
+
     private String accountNumber;
     private String pin;
 }
