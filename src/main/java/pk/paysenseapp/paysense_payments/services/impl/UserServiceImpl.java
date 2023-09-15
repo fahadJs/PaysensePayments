@@ -70,6 +70,7 @@ public class UserServiceImpl implements UserService {
                 .qrCode(AccountUtils.generateQrId(userRegisterRequest.getPhoneNumber(),16))
                 .faceImage("UPLOAD PENDING")
                 .nicImage("UPLOAD PENDING")
+                .docStatus("PENDING")
                 .accountBalance(BigDecimal.valueOf(0.0))
                 .accountNumber(userRegisterRequest.getPhoneNumber())
                 .build();
@@ -122,6 +123,7 @@ public class UserServiceImpl implements UserService {
         foundUser.setCity(userRequest.getCity());
         foundUser.setAddress(userRequest.getAddress());
         foundUser.setStatus("ACTIVE");
+        foundUser.setDocStatus("APPROVED");
 
         User savedUser = userRepo.save(foundUser);
 
@@ -391,6 +393,7 @@ public class UserServiceImpl implements UserService {
                         .accountName(accountFound.getFirstName() + " " + accountFound.getLastName())
                         .accountNumber(accountFound.getAccountNumber())
                         .accountBalance(accountFound.getAccountBalance())
+                        .docStatus(accountFound.getDocStatus())
                         .build())
                 .build();
     }

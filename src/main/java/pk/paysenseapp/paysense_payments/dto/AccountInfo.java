@@ -15,5 +15,6 @@ public class AccountInfo {
 
     private String accountName;
     private String accountNumber;
+    private String docStatus;
     private BigDecimal accountBalance;
 }

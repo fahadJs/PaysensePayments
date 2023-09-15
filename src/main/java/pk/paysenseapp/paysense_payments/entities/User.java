@@ -50,6 +50,8 @@ public class User {
 
     private String nicImage;
 
+    private String docStatus;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
