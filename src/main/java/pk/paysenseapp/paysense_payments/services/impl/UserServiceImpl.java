@@ -150,8 +150,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public BankResponse balanceEnquiry(EnquiryRequest enquiryRequest) {
-        Boolean isAccountExist = userRepo.existsByAccountNumber(enquiryRequest.getAccountNumber());
+    public BankResponse balanceEnquiry(String accountNumber) {
+        Boolean isAccountExist = userRepo.existsByAccountNumber(accountNumber);
         if (!isAccountExist){
             return BankResponse.builder()
                     .responseCode(HttpStatus.OK.toString())
@@ -160,7 +160,7 @@ public class UserServiceImpl implements UserService {
                     .build();
         }
 
-        User accountFound = userRepo.findByAccountNumber(enquiryRequest.getAccountNumber());
+        User accountFound = userRepo.findByAccountNumber(accountNumber);
         log.info("balanceEnquiry GET Request successfully processed!");
         return BankResponse.builder()
                 .responseCode(HttpStatus.OK.toString())
@@ -174,15 +174,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String nameEnquiry(EnquiryRequest enquiryRequest) {
-        Boolean isAccountExist = userRepo.existsByAccountNumber(enquiryRequest.getAccountNumber());
+    public BankResponse nameEnquiry(String accountNumber) {
+        Boolean isAccountExist = userRepo.existsByAccountNumber(accountNumber);
         if (!isAccountExist){
-            return AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE;
+            return BankResponse.builder()
+                    .responseCode(HttpStatus.OK.toString())
+                    .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
+                    .accountInfo(null)
+                    .build();
         }
 
-        User accountFound = userRepo.findByAccountNumber(enquiryRequest.getAccountNumber());
+        User accountFound = userRepo.findByAccountNumber(accountNumber);
         log.info("nameEnquiry GET Request successfully processed!");
-        return accountFound.getFirstName() + " " + accountFound.getLastName();
+        return BankResponse.builder()
+                .responseCode(HttpStatus.OK.toString())
+                .responseMessage(AccountUtils.ACCOUNT_FOUND_MESSAGE)
+                .accountInfo(AccountInfo.builder()
+                        .accountBalance(accountFound.getAccountBalance())
+                        .accountNumber(accountFound.getAccountNumber())
+                        .accountName(accountFound.getFirstName() +" "+ accountFound.getLastName())
+                        .build())
+                .build();
     }
 
     @Override
@@ -302,7 +314,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User sourceAccountUser = userRepo.findByAccountNumber(transferRequest.getSourceAccountNumber());
-        if (transferRequest.getAmount().compareTo(sourceAccountUser.getAccountBalance()) > 0){
+        if (transferRequest.getAmount().compareTo(sourceAccountUser.getAccountBalance()) >= 0){
             return BankResponse.builder()
                     .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.INSUFFICIENT_BALANCE_MESSAGE)
@@ -399,8 +411,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public QrCodeResponse qrCodePayment(QrCodeRequest qrCodeRequest) {
-        User foundUser = userRepo.findByQrCode(qrCodeRequest.getQrCodeId());
+    public QrCodeResponse qrCodePayment(String qrCodeId) {
+        User foundUser = userRepo.findByQrCode(qrCodeId);
         if (foundUser != null) {
             log.info("qrCode GET Request successfully processed!");
             return QrCodeResponse.builder()

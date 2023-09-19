@@ -8,9 +8,9 @@ public interface UserService {
 
     BankResponse createAccount(UserRequest userRequest, String accountNumber);
 
-    BankResponse balanceEnquiry(EnquiryRequest enquiryRequest);
+    BankResponse balanceEnquiry(String accountNumber);
 
-    String nameEnquiry(EnquiryRequest enquiryRequest);
+    BankResponse nameEnquiry(String accountNumber);
 
     BankResponse creditAmount(CreditRequest creditRequest);
 
@@ -20,5 +20,5 @@ public interface UserService {
 
     BankResponse pinVerification(PinVerificationRequest pinVerificationRequest);
 
-    QrCodeResponse qrCodePayment(QrCodeRequest qrCodeRequest);
+    QrCodeResponse qrCodePayment(String qrCodeId);
 }

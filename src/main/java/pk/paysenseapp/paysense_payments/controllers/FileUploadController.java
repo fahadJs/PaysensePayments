@@ -1,18 +1,12 @@
 package pk.paysenseapp.paysense_payments.controllers;
 
 import lombok.extern.log4j.Log4j2;
-import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import pk.paysenseapp.paysense_payments.dto.BankResponse;
 import pk.paysenseapp.paysense_payments.dto.FileUploadResponse;
 import pk.paysenseapp.paysense_payments.services.FileUploadService;
-
-import java.io.File;
 
 @RestController
 @RequestMapping("/api/fileUpload")
@@ -26,9 +20,9 @@ public class FileUploadController {
         this.fileUploadService = fileUploadService;
     }
 
-    @PutMapping("/nic/{accountNumber}")
+    @PutMapping("/nic/")
     public ResponseEntity<FileUploadResponse> uploadImageNic(@RequestBody(required = false) MultipartFile image,
-                                          @PathVariable String accountNumber){
+                                          @RequestParam String accountNumber){
 
         if (image != null){
             log.info("uploadImageNic PUT Request is processing!");
@@ -44,9 +38,9 @@ public class FileUploadController {
         }
     }
 
-    @PutMapping("/face/{accountNumber}")
+    @PutMapping("/face/")
     public ResponseEntity<FileUploadResponse> uploadImageFace(@RequestBody(required = false) MultipartFile image,
-                                          @PathVariable String accountNumber){
+                                          @RequestParam String accountNumber){
         if (image != null){
             log.info("uploadImageFace PUT Request is processing!");
             FileUploadResponse response = fileUploadService.uploadImageFace(image, accountNumber);

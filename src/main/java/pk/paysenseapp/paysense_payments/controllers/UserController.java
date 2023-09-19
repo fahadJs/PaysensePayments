@@ -17,7 +17,8 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
-    private final String errorMessage = "Request Body can not be null!";
+    private final String postError = "Request Body can not be null!";
+    private final String getError = "Parameter is not provided!";
 
     @PostMapping("/registerUser")
     public ResponseEntity<UserRegisterResponse> registerResponse(@RequestBody(required = false) UserRegisterRequest registerRequest){
@@ -26,53 +27,57 @@ public class UserController {
             UserRegisterResponse response = userService.registerUser(registerRequest);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }else {
-            log.error(errorMessage);
+            log.error(postError);
             UserRegisterResponse response = new UserRegisterResponse();
             response.setResponseCode(HttpStatus.BAD_REQUEST.toString());
-            response.setResponseMessage(errorMessage);
+            response.setResponseMessage(postError);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PutMapping("/createAccount/{accountNumber}")
+    @PutMapping("/createAccount/")
     public ResponseEntity<BankResponse> createAccount(@RequestBody(required = false) UserRequest userRequest,
-                                       @PathVariable String accountNumber){
+                                       @RequestParam String accountNumber){
         if (userRequest != null){
             log.info("createAccount PUT Request is processing!");
             BankResponse response = userService.createAccount(userRequest, accountNumber);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }else {
-            log.error(errorMessage);
+            log.error(postError);
             BankResponse response = new BankResponse();
             response.setResponseCode(HttpStatus.BAD_REQUEST.toString());
-            response.setResponseMessage(errorMessage);
+            response.setResponseMessage(postError);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/balanceEnquiry")
-    public ResponseEntity<BankResponse> balanceEnquiry(@RequestBody(required = false) EnquiryRequest enquiryRequest){
-        if (enquiryRequest != null){
+    public ResponseEntity<BankResponse> balanceEnquiry(@RequestParam(required = false) String accountNumber){
+        if (accountNumber != null){
             log.info("balanceEnquiry GET Request is processing!");
-            BankResponse response = userService.balanceEnquiry(enquiryRequest);
+            BankResponse response = userService.balanceEnquiry(accountNumber);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }else {
-            log.error(errorMessage);
+            log.error(getError);
             BankResponse response = new BankResponse();
             response.setResponseCode(HttpStatus.BAD_REQUEST.toString());
-            response.setResponseMessage(errorMessage);
+            response.setResponseMessage(getError);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/nameEnquiry")
-    public ResponseEntity<String> nameEnquiry(@RequestBody(required = false) EnquiryRequest enquiryRequest){
-        if (enquiryRequest != null){
+    public ResponseEntity<BankResponse> nameEnquiry(@RequestParam(required = false) String accountNumber){
+        if (accountNumber != null){
             log.info("nameEnquiry GET Request is processing!");
-            return new ResponseEntity<>(userService.nameEnquiry(enquiryRequest), HttpStatus.OK);
+            BankResponse response = userService.nameEnquiry(accountNumber);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }else {
-            log.error(errorMessage);
-            return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+            log.error(getError);
+            BankResponse response = new BankResponse();
+            response.setResponseCode(HttpStatus.BAD_REQUEST.toString());
+            response.setResponseMessage(getError);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -83,10 +88,10 @@ public class UserController {
             BankResponse response = userService.creditAmount(creditRequest);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }else {
-            log.error(errorMessage);
+            log.error(postError);
             BankResponse response = new BankResponse();
             response.setResponseCode(HttpStatus.BAD_REQUEST.toString());
-            response.setResponseMessage(errorMessage);
+            response.setResponseMessage(postError);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
@@ -98,10 +103,10 @@ public class UserController {
             BankResponse response = userService.debitAmount(debitRequest);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }else {
-            log.error(errorMessage);
+            log.error(postError);
             BankResponse response = new BankResponse();
             response.setResponseCode(HttpStatus.BAD_REQUEST.toString());
-            response.setResponseMessage(errorMessage);
+            response.setResponseMessage(postError);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
@@ -113,40 +118,40 @@ public class UserController {
             BankResponse response = userService.transferAmount(transferRequest);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }else {
-            log.error(errorMessage);
+            log.error(postError);
             BankResponse response = new BankResponse();
             response.setResponseCode(HttpStatus.BAD_REQUEST.toString());
-            response.setResponseMessage(errorMessage);
+            response.setResponseMessage(postError);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
 
-    @GetMapping("/pinVerification")
+    @PostMapping("/pinVerification")
     public ResponseEntity<BankResponse> pinVerification(@RequestBody(required = false) PinVerificationRequest pinVerificationRequest){
         if (pinVerificationRequest != null){
             log.info("pinVerification GET Request is processing!");
             BankResponse response = userService.pinVerification(pinVerificationRequest);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }else {
-            log.error(errorMessage);
+            log.error(postError);
             BankResponse response = new BankResponse();
             response.setResponseCode(HttpStatus.BAD_REQUEST.toString());
-            response.setResponseMessage(errorMessage);
+            response.setResponseMessage(postError);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/qrCode")
-    public ResponseEntity<QrCodeResponse> qrCodeResponse(@RequestBody(required = false) QrCodeRequest qrCodeRequest){
-        if (qrCodeRequest != null){
+    public ResponseEntity<QrCodeResponse> qrCodeResponse(@RequestParam(required = false) String qrCodeId){
+        if (qrCodeId != null){
             log.info("qrCode GET Request is processing!");
-            QrCodeResponse response = userService.qrCodePayment(qrCodeRequest);
+            QrCodeResponse response = userService.qrCodePayment(qrCodeId);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }else {
-            log.error(errorMessage);
+            log.error(getError);
             QrCodeResponse response = new QrCodeResponse();
             response.setResponseCode(HttpStatus.BAD_REQUEST.toString());
-            response.setResponseMessage(errorMessage);
+            response.setResponseMessage(getError);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
