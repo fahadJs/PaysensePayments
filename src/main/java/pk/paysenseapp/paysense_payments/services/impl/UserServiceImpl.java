@@ -375,11 +375,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public BankResponse pinVerification(PinVerificationRequest pinVerificationRequest) {
+    public PinVerificationResponse pinVerification(PinVerificationRequest pinVerificationRequest) {
 
         Boolean isAccountExist = userRepo.existsByAccountNumber(pinVerificationRequest.getAccountNumber());
         if (!isAccountExist){
-            return BankResponse.builder()
+            return PinVerificationResponse.builder()
                     .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
                     .accountInfo(null)
@@ -390,7 +390,7 @@ public class UserServiceImpl implements UserService {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
         if (!bCryptPasswordEncoder.matches(pinVerificationRequest.getPin(),accountFound.getPin())){
-            return BankResponse.builder()
+            return PinVerificationResponse.builder()
                     .responseCode(HttpStatus.OK.toString())
                     .responseMessage(AccountUtils.PIN_VERIFICATION_FAILED_MESSAGE)
                     .accountInfo(null)
@@ -398,13 +398,22 @@ public class UserServiceImpl implements UserService {
         }
 
         log.info("pinVerification GET Request successfully processed!");
-        return BankResponse.builder()
+        return PinVerificationResponse.builder()
                 .responseCode(HttpStatus.OK.toString())
                 .responseMessage(AccountUtils.PIN_VERIFICATION_SUCCESS_MESSAGE)
-                .accountInfo(AccountInfo.builder()
-                        .accountName(accountFound.getFirstName() + " " + accountFound.getLastName())
+                .accountInfo(User.builder()
+                        .firstName(accountFound.getFirstName())
+                        .lastName(accountFound.getLastName())
+                        .gender(accountFound.getGender())
+                        .city(accountFound.getCity())
+                        .address(accountFound.getAddress())
+                        .email(accountFound.getEmail())
                         .accountNumber(accountFound.getAccountNumber())
+                        .username(accountFound.getUsername())
+                        .phoneNumber(accountFound.getPhoneNumber())
                         .accountBalance(accountFound.getAccountBalance())
+                        .status(accountFound.getStatus())
+                        .qrCode(accountFound.getQrCode())
                         .docStatus(accountFound.getDocStatus())
                         .build())
                 .build();

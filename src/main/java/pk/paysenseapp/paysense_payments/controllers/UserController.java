@@ -127,14 +127,14 @@ public class UserController {
     }
 
     @PostMapping("/pinVerification")
-    public ResponseEntity<BankResponse> pinVerification(@RequestBody(required = false) PinVerificationRequest pinVerificationRequest){
+    public ResponseEntity<PinVerificationResponse> pinVerification(@RequestBody(required = false) PinVerificationRequest pinVerificationRequest){
         if (pinVerificationRequest != null){
             log.info("pinVerification GET Request is processing!");
-            BankResponse response = userService.pinVerification(pinVerificationRequest);
+            PinVerificationResponse response = userService.pinVerification(pinVerificationRequest);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }else {
             log.error(postError);
-            BankResponse response = new BankResponse();
+            PinVerificationResponse response = new PinVerificationResponse();
             response.setResponseCode(HttpStatus.BAD_REQUEST.toString());
             response.setResponseMessage(postError);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
